@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+	http://www.springframework.org/schema/mvc
+	http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+
+    <!--还是包扫描，这个主要是controller-->
+    <context:component-scan base-package="top.winxblast.happymall" annotation-config="true"/>
+
+    <mvc:annotation-driven>
+        <mvc:message-converters>
+            <!--这个还是编码的设置-->
+            <bean class="org.springframework.http.converter.StringHttpMessageConverter">
+                <property name="supportedMediaTypes">
+                    <list>
+                        <value>text/plain;charset=UTF-8</value>
+                        <value>text/html;charset=UTF-8</value>
+                    </list>
+                </property>
+            </bean>
+            <!--springMVC自动反序列化用到的配置类-->
+            <bean class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter">
+                <!--<property name="objectMapper">-->
+                    <!--<bean class="org.codehaus.jackson.map.ObjectMapper">-->
+                        <!--<property name="serializationInclusion" value="NON_EMPTY"/>-->
+                    <!--</bean>-->
+                <!--</property>-->
+                <property name="supportedMediaTypes">
+                    <list>
+                        <value>application/json;charset=UTF-8</value>
+                    </list>
+                </property>
+            </bean>
+        </mvc:message-converters>
+    </mvc:annotation-driven>
+
+
+    <!--文件上传,直接使用springMVC提供的包-->
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <!--10Mb，下面的单位是字节-->
+        <property name="maxUploadSize" value="10485760"/>
+        <!--给上传文件分配内存块的大小，可能就是类似于一个缓存吧-->
+        <property name="maxInMemorySize" value="4096"/>
+        <property name="defaultEncoding" value="UTF-8"/>
+    </bean>
+
+</beans>
