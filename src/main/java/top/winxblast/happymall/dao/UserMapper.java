@@ -1,5 +1,6 @@
 package top.winxblast.happymall.dao;
 
+import org.apache.ibatis.annotations.Param;
 import top.winxblast.happymall.pojo.User;
 
 public interface UserMapper {
@@ -50,4 +51,72 @@ public interface UserMapper {
      * @mbggenerated Sun Oct 08 14:03:47 CST 2017
      */
     int updateByPrimaryKey(User record);
+
+
+    /**
+     * 通过用户名来查询数据库中是否存在用户
+     * @param username
+     * @return 用户数量
+     */
+    int checkUsername(String username);
+
+    /**
+     * 查看email是否已经被注册
+     * @param email
+     * @return
+     */
+    int checkEmail(String email);
+
+
+    /**
+     * 通过用户名和密码查看是否有这个用户
+     * mybatis在传递多个参数的时候需要用到param注解，写sql时就对应注解里的string
+     * @param username
+     * @param password
+     * @return
+     */
+    User selectLogin(@Param("username") String username, @Param("password") String password);
+
+    /**
+     * 通过用户名来获取密码提示问题
+     * @param username
+     * @return
+     */
+    String selectQuestionByUsername(String username);
+
+    /**
+     * 检查密码找回问题的答案是否正确
+     * 多个传入参数还是老规矩要使用@Param
+     * @param username
+     * @param question
+     * @param answer
+     * @return
+     */
+    int checkAnswer(@Param("username")String username, @Param("question")String question, @Param("answer")String answer);
+
+    /**
+     * 通过用户名修改密码
+     * @param username
+     * @param passwordNew
+     * @return
+     */
+    int updatePasswordByUsername(@Param("username")String username, @Param("passwordNew")String passwordNew);
+
+    /**
+     * 通过用户id验证密码是否正确，这个感觉跟selectLogin有点重复，只不过一个返回用户，
+     * 一个返回查询到的数量，可能取用户的多个字段性能会差一点，具体差多少有待试验
+     * @param userId
+     * @param password
+     * @return
+     */
+    int checkPassword(@Param("userId")Integer userId, @Param("password")String password);
+
+    /**
+     * 检查email地址是否有其他用户使用
+     * @param userId
+     * @param email
+     * @return 返回1，则email地址已被使用，返回0，则email未被使用
+     */
+    int checkEmailByUserId(@Param("userId")Integer userId, @Param("email")String email);
+
 }
