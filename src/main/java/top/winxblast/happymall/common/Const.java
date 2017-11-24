@@ -19,7 +19,32 @@ public class Const {
      * 接口中的域将被自动设为 public static final
      */
     public interface Role{
-        int ROLE_CUSTOMER = 0; //普通用户
-        int ROLE_ADMIN = 1; //管理员
+        //普通用户
+        int ROLE_CUSTOMER = 0;
+        //管理员
+        int ROLE_ADMIN = 1;
+    }
+
+    /**
+     * 商品状态枚举类，指上下架状态
+     */
+    public enum ProductStatusEnum{
+        ON_SALE(1,"在线");
+
+        private int code;
+        private String value;
+
+        ProductStatusEnum(int code, String value) {
+            this.code = code;
+            this.value = value;
+        }
+
+        public int getCode() {
+            return code;
+        }
+
+        public String getValue() {
+            return value;
+        }
     }
 }

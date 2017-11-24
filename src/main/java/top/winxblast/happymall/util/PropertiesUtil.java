@@ -18,6 +18,8 @@ public class PropertiesUtil {
 
     private static Properties props;
 
+    //写一点老生长谈的基础内容，一个类加载，静态块优于普通代码块，优于构造函数
+    //且静态块只加载一次
     static {
         String fileName = "happymall.properties";
         props = new Properties();

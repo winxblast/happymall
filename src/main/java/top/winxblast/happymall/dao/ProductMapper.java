@@ -1,6 +1,9 @@
 package top.winxblast.happymall.dao;
 
+import org.apache.ibatis.annotations.Param;
 import top.winxblast.happymall.pojo.Product;
+
+import java.util.List;
 
 public interface ProductMapper {
     /**
@@ -50,4 +53,18 @@ public interface ProductMapper {
      * @mbggenerated Sun Oct 08 14:03:47 CST 2017
      */
     int updateByPrimaryKey(Product record);
+
+    /**
+     * 商品列表，没有任何搜索选项，分页靠插件完成
+     * @return
+     */
+    List<Product> selectList();
+
+    /**
+     * 通过商品名称或者ID查询商品列表
+     * @param productName
+     * @param productId
+     * @return
+     */
+    List<Product> selectByNameAndProductId(@Param("productName")String productName, @Param("productId")Integer productId);
 }
