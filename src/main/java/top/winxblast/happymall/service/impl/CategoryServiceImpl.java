@@ -45,7 +45,8 @@ public class CategoryServiceImpl implements CategoryService {
         Category category = new Category();
         category.setName(categoryName);
         category.setParentId(parentId);
-        category.setStatus(true);//表示这个分类是可用的，有效的
+        //表示这个分类是可用的，有效的
+        category.setStatus(true);
 
         int rowCount = categoryMapper.insert(category);
         if(rowCount > 0) {
@@ -99,7 +100,7 @@ public class CategoryServiceImpl implements CategoryService {
      * @return
      */
     @Override
-    public ServerResponse selectCategoryAndChildrenById(Integer categoryId) {
+    public ServerResponse<List<Integer>> selectCategoryAndChildrenById(Integer categoryId) {
         //这个跟我平时不一样，用的谷歌的一个包来初始化，里面也有很多方便的工具
         Set<Category> categorySet = Sets.newHashSet();
         findChildCatgory(categorySet,categoryId);

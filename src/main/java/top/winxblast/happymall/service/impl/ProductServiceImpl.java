@@ -14,12 +14,14 @@ import top.winxblast.happymall.dao.CategoryMapper;
 import top.winxblast.happymall.dao.ProductMapper;
 import top.winxblast.happymall.pojo.Category;
 import top.winxblast.happymall.pojo.Product;
+import top.winxblast.happymall.service.CategoryService;
 import top.winxblast.happymall.service.ProductService;
 import top.winxblast.happymall.util.DateTimeUtil;
 import top.winxblast.happymall.util.PropertiesUtil;
 import top.winxblast.happymall.vo.ProductDetailVo;
 import top.winxblast.happymall.vo.ProductListVo;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -35,6 +37,8 @@ public class ProductServiceImpl implements ProductService {
     private ProductMapper productMapper;
     @Autowired
     private CategoryMapper categoryMapper;
+    @Autowired
+    private CategoryService categoryService;
 
     /**
      * 新增或者更新产品，这个在前端需要分开两个功能，在后端可以在一个方法中实现
@@ -242,6 +246,64 @@ public class ProductServiceImpl implements ProductService {
         //通过一个私有化的方法来组装这个对象
         ProductDetailVo productDetailVo = assembleProductDetailVo(product);
         return ServerResponse.createBySuccess(productDetailVo);
+    }
+
+    /**
+     * 通过关键字和商品分类获取商品列表分页
+     * @param keyword
+     * @param categoryId
+     * @param pageNum
+     * @param pageSize
+     * @param orderBy
+     * @return
+     */
+    @Override
+    public ServerResponse<PageInfo> getProductByKeywordCategory(String keyword, Integer categoryId,
+                                                                int pageNum, int pageSize, String orderBy) {
+        if(StringUtils.isBlank(keyword) && categoryId == null) {
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.ILLEGAL_ARGUMENT.getCode(),ResponseCode.ILLEGAL_ARGUMENT.getDesc());
+        }
+        //这个是为了在categoryId是一个大的父分类的时候，可以把下面的小分类全部找出来放进去
+        List<Integer> categoryIdList = new ArrayList<>();
+
+        if(categoryId != null) {
+            Category category = categoryMapper.selectByPrimaryKey(categoryId);
+            if(category == null && StringUtils.isBlank(keyword)) {
+                //没有该分类，并且还没有关键字，这个时候返回一个空的结果集，不报错，这个是和前端的商量结果，不一定的···
+                PageHelper.startPage(pageNum,pageSize);
+                List<ProductListVo> productListVoList = Lists.newArrayList();
+                PageInfo pageInfo = new PageInfo(productListVoList);
+                return ServerResponse.createBySuccess(pageInfo);
+            }
+            categoryIdList = categoryService.selectCategoryAndChildrenById(category.getId()).getData();
+        }
+
+        if(StringUtils.isNoneBlank(keyword)) {
+            keyword = new StringBuilder().append("%").append(keyword).append("%").toString();
+        }
+
+        PageHelper.startPage(pageNum,pageSize);
+        //排序处理
+        if(StringUtils.isNotBlank(orderBy)) {
+           if(Const.ProductListOrderBy.PRICE_ASC_DESC.contains(orderBy)) {
+               String[] orderByArray = orderBy.split("_");
+               PageHelper.orderBy(orderByArray[0]+" "+orderByArray[1]);
+           }
+        }
+        List<Product> productList = productMapper.selectByNameAndCategoryIds(StringUtils.isBlank(keyword)?null:keyword,
+                categoryIdList.size()==0?null:categoryIdList);
+
+        List<ProductListVo> productListVoList = Lists.newArrayList();
+        for(Product product : productList) {
+            ProductListVo productListVo = assembleProductListVo(product);
+            productListVoList.add(productListVo);
+        }
+
+        //我感觉下面两句就可以合成一句
+        PageInfo pageInfo = new PageInfo(productList);
+        pageInfo.setList(productListVoList);
+
+        return ServerResponse.createBySuccess(pageInfo);
     }
 
 }

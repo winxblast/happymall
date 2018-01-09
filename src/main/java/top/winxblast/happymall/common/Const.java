@@ -1,5 +1,9 @@
 package top.winxblast.happymall.common;
 
+import com.google.common.collect.Sets;
+
+import java.util.Set;
+
 /**
  * 常量类
  *
@@ -12,6 +16,11 @@ public class Const {
 
     public static final String EMAIL = "email";
     public static final String USERNAME = "username";
+
+    public interface ProductListOrderBy{
+        //这样使用set而不同于Role那个接口，是为了可以舒服的增加其他排序的set
+        Set<String> PRICE_ASC_DESC = Sets.newHashSet("price_asc", "price_desc");
+    }
 
     /**
      * 这个分组如果使用枚举类可能显得比较重，这里用一个接口
